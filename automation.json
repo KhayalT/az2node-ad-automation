@@ -1,5 +1,6 @@
 {
-  "name": "Ad Automation Publisher (AZ2Node)",
+  "name": "Ad Automation Publisher",
+  "id": "1",
   "nodes": [
     {
       "parameters": {
@@ -13,11 +14,13 @@
           ]
         }
       },
-      "id": "CronTrigger",
-      "name": "Cron Trigger (every 15 min)",
+      "name": "Cron Trigger",
       "type": "n8n-nodes-base.cron",
       "typeVersion": 1,
-      "position": [200, 300]
+      "position": [
+        200,
+        300
+      ]
     },
     {
       "parameters": {
@@ -25,21 +28,25 @@
         "responseFormat": "json",
         "options": {}
       },
-      "id": "GetCampaigns",
       "name": "Get Active Campaigns",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [450, 300]
+      "position": [
+        450,
+        300
+      ]
     },
     {
       "parameters": {
         "batchSize": 1
       },
-      "id": "SplitBatches",
       "name": "Split Campaigns",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [700, 300]
+      "position": [
+        700,
+        300
+      ]
     },
     {
       "parameters": {
@@ -53,11 +60,13 @@
           ]
         }
       },
-      "id": "IfChannelFacebook",
       "name": "If Channel is Facebook",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [950, 300]
+      "position": [
+        950,
+        300
+      ]
     },
     {
       "parameters": {
@@ -65,14 +74,15 @@
         "url": "https://dummyjson.com/posts/add",
         "responseFormat": "json",
         "jsonParameters": true,
-        "options": {},
         "bodyParametersJson": "={\n  \"campaign_id\": $json[\"id\"],\n  \"media_url\": $json[\"media_url\"],\n  \"caption\": $json[\"caption\"],\n  \"channel\": $json[\"channel\"]\n}"
       },
-      "id": "PublishToDummyFacebook",
       "name": "Publish to Dummy Facebook API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [1200, 200]
+      "position": [
+        1200,
+        200
+      ]
     },
     {
       "parameters": {
@@ -82,23 +92,17 @@
         "jsonParameters": true,
         "bodyParametersJson": "={\n  \"campaign_id\": $json[\"id\"],\n  \"status\": \"success\",\n  \"channel\": $json[\"channel\"],\n  \"message\": \"Posted successfully\"\n}"
       },
-      "id": "SendReportToBackend",
       "name": "Send Report to Backend",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
-      "position": [1450, 200]
-    },
-    {
-      "parameters": {},
-      "id": "NoCampaigns",
-      "name": "No Campaigns Found",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [950, 450]
+      "position": [
+        1450,
+        200
+      ]
     }
   ],
   "connections": {
-    "Cron Trigger (every 15 min)": {
+    "Cron Trigger": {
       "main": [
         [
           {
@@ -139,13 +143,6 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "No Campaigns Found",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
@@ -162,8 +159,6 @@
     }
   },
   "active": false,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "id": "Ad-Automation-AZ2Node"
+  "settings": {},
+  "staticData": {}
 }
