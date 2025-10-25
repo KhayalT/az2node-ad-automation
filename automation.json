@@ -1,0 +1,169 @@
+{
+  "name": "Ad Automation Publisher (AZ2Node)",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 15,
+              "unit": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "CronTrigger",
+      "name": "Cron Trigger (every 15 min)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://your-backend.com/api/ads/active-campaigns",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "id": "GetCampaigns",
+      "name": "Get Active Campaigns",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "SplitBatches",
+      "name": "Split Campaigns",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"channel\"]}}",
+              "operation": "equal",
+              "value2": "facebook"
+            }
+          ]
+        }
+      },
+      "id": "IfChannelFacebook",
+      "name": "If Channel is Facebook",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [950, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dummyjson.com/posts/add",
+        "responseFormat": "json",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"campaign_id\": $json[\"id\"],\n  \"media_url\": $json[\"media_url\"],\n  \"caption\": $json[\"caption\"],\n  \"channel\": $json[\"channel\"]\n}"
+      },
+      "id": "PublishToDummyFacebook",
+      "name": "Publish to Dummy Facebook API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-backend.com/api/ads/report",
+        "responseFormat": "json",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"campaign_id\": $json[\"id\"],\n  \"status\": \"success\",\n  \"channel\": $json[\"channel\"],\n  \"message\": \"Posted successfully\"\n}"
+      },
+      "id": "SendReportToBackend",
+      "name": "Send Report to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {},
+      "id": "NoCampaigns",
+      "name": "No Campaigns Found",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [950, 450]
+    }
+  ],
+  "connections": {
+    "Cron Trigger (every 15 min)": {
+      "main": [
+        [
+          {
+            "node": "Get Active Campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Campaigns": {
+      "main": [
+        [
+          {
+            "node": "Split Campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Campaigns": {
+      "main": [
+        [
+          {
+            "node": "If Channel is Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Channel is Facebook": {
+      "main": [
+        [
+          {
+            "node": "Publish to Dummy Facebook API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Campaigns Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Dummy Facebook API": {
+      "main": [
+        [
+          {
+            "node": "Send Report to Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "Ad-Automation-AZ2Node"
+}
